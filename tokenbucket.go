@@ -48,3 +48,7 @@ func (l *TokenBucket) Allow() bool {
 	}
 	return false
 }
+
+func (l *TokenBucket) Last() time.Time {
+	return l.last
+}

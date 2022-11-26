@@ -7,7 +7,8 @@ import (
 
 // SlidingWindow slide-windows algorithm implemention
 type SlidingWindow struct {
-	mu sync.Mutex
+	mu   sync.Mutex
+	last time.Time // just store last allow time
 
 	Span  float64 // second
 	Burst float64
@@ -28,6 +29,7 @@ func NewSlidingWindow(span, burst float64) *SlidingWindow {
 		prevCount: 0,
 		currCount: 0,
 		currStart: time.Now(),
+		last:      time.Now(),
 	}
 }
 
@@ -36,6 +38,7 @@ func (l *SlidingWindow) Allow() bool {
 	defer l.mu.Unlock()
 
 	current := time.Now()
+	l.last = current
 
 	// reach next(or multiple next) window, update current window
 	if float64(current.Sub(l.currStart))/float64(time.Second) > l.Span {
@@ -60,4 +63,8 @@ func (l *SlidingWindow) Allow() bool {
 	}
 	l.currCount++
 	return true
+}
+
+func (l *SlidingWindow) Last() time.Time {
+	return l.last
 }
