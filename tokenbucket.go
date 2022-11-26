@@ -18,7 +18,7 @@ type TokenBucket struct {
 	last   time.Time
 }
 
-func NewTokenBucket(span, burst float64) *TokenBucket {
+func NewTokenBucket(span, burst float64) RateLimiter {
 	return &TokenBucket{
 		Span:   span,
 		Burst:  burst,

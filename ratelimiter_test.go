@@ -1,6 +1,7 @@
 package ratelimit
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -13,7 +14,7 @@ func TestTokenBucketLimiter(t *testing.T) {
 
 		for i := 0; i < 100; i++ {
 			time.Sleep(100 * time.Millisecond) // 10 qps
-			t.Log(i, b.Allow(), b.tokens)
+			t.Log(i, b.Allow())
 		}
 	}
 
@@ -30,7 +31,7 @@ func TestTokenBucketLimiter(t *testing.T) {
 				time.Sleep(100 * time.Millisecond)
 				for j := 0; j < 100; j++ {
 					time.Sleep(200 * time.Millisecond) // 5 qps
-					t.Log(idx, j, b.Allow(), b.tokens)
+					t.Log(idx, j, b.Allow())
 				}
 			}(i)
 		}
@@ -95,4 +96,30 @@ func TestSlidingWindow(t *testing.T) {
 		}
 		wg.Wait()
 	}
+}
+
+func TestRateLimiterPool(t *testing.T) {
+	pool := NewRateLimiterPool(
+		WithNewLimiterFunc(NewTokenBucket),
+		WithGCPeriod(2*time.Second),
+		WithExpiredPeriod(3*time.Second),
+	)
+
+	wg := sync.WaitGroup{}
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func(idx int) {
+			defer wg.Done()
+
+			fingerprint := fmt.Sprintf("IP:127.0.0.%d", idx)
+			time.Sleep(1 * time.Second)
+			for j := 0; j < 100; j++ {
+				time.Sleep(150 * time.Millisecond)
+				// t.Log(fingerprint, j, pool.Allow(fingerprint, 1, 5))
+				pool.Allow(fingerprint, 1, 5)
+			}
+		}(i)
+	}
+	wg.Wait()
+	time.Sleep(10 * time.Second)
 }

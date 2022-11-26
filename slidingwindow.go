@@ -22,7 +22,7 @@ type SlidingWindow struct {
 	currStart time.Time
 }
 
-func NewSlidingWindow(span, burst float64) *SlidingWindow {
+func NewSlidingWindow(span, burst float64) RateLimiter {
 	return &SlidingWindow{
 		Span:      span,
 		Burst:     burst,
