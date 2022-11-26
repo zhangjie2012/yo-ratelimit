@@ -39,5 +39,5 @@ if pool.Allow("userid:10001", 60, 1000) {
 
 which means: the `10001` user 1 minute max request 1000 times.
 
-more example checkout: <./ratelimiter_test.go>
+more example checkout: [ratelimiter_test.go](./ratelimiter_test.go)
 
