@@ -24,7 +24,7 @@ _Above example 1 minute max 60000 request, in fact, not equal `qps = 6000`._
 
 if you want complex sence, for single userid, IP, or api request set a ratelimit. `RateLimiterPool` may be helpful for you.
 
-```
+``` go
 pool := NewRateLimiterPool(
     WithNewLimiterFunc(NewTokenBucket),
     WithGCPeriod(1*time.Hour),
